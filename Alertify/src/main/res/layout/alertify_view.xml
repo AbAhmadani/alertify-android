@@ -1,0 +1,33 @@
+<!-- res/layout/custom_alertify_view.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <!-- Icon at the start -->
+    <ImageView
+        android:id="@+id/alert_icon"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+         />
+
+    <!-- Text message -->
+    <TextView
+        android:id="@+id/alert_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="10dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textColor="@android:color/black" />
+
+    <!-- Close button -->
+    <ImageView
+        android:id="@+id/alert_close_button"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:src="@drawable/ic_close" />
+</LinearLayout>

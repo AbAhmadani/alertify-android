@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- res/values/colors.xml -->
+    <color name="success_dark">#2E7D32</color>
+    <color name="success_light">#C8E6C9</color>
+    <color name="error_dark">#D32F2F</color>
+    <color name="error_light">#FFCDD2</color>
+    <color name="info_dark">#1976D2</color>
+    <color name="info_light">#BBDEFB</color>
+    <color name="warning_dark">#FFA000</color>
+    <color name="warning_light">#FFE082</color>
+
+</resources>

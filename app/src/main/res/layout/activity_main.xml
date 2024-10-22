@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    tools:context=".MainActivity">
+
+    <!-- Custom Alertify view -->
+    <com.example.alertify.Alertify
+        android:id="@+id/alertify"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <!-- Buttons to trigger alerts -->
+    <Button
+        android:id="@+id/button_success"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Success Alert"
+        android:layout_margin="16dp"/>
+
+    <Button
+        android:id="@+id/button_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Error Alert"
+        android:layout_below="@id/button_success"
+        android:layout_margin="16dp" />
+
+    <Button
+        android:id="@+id/button_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Info Alert"
+        android:layout_below="@id/button_error"
+        android:layout_margin="16dp" />
+
+    <Button
+        android:id="@+id/button_warning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show Warning Alert"
+        android:layout_below="@id/button_info"
+        android:layout_margin="16dp" />
+</LinearLayout>
