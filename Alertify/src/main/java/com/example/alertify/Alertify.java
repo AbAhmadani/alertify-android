@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +13,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 public class Alertify extends LinearLayout {
@@ -21,7 +20,8 @@ public class Alertify extends LinearLayout {
     private TextView alertMessage;
     private ImageView alertIcon;
     private ImageView closeButton;
-    private final Handler handler = new Handler();
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
     private static final long ANIMATION_DURATION = 200; // Animation duration in milliseconds
 
     public Alertify(Context context, AttributeSet attrs) {
@@ -48,12 +48,7 @@ public class Alertify extends LinearLayout {
         setVisibility(View.GONE);
 
         // Close button action
-        closeButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                hideAlertWithAnimation();
-            }
-        });
+        closeButton.setOnClickListener(v -> hideAlertWithAnimation());
     }
 
     // Show an alert with a specific type, message, and duration
@@ -69,12 +64,7 @@ public class Alertify extends LinearLayout {
 
         // Hide the alert after a certain duration
         if (duration > 0) {
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    hideAlertWithAnimation();
-                }
-            }, duration);
+            handler.postDelayed(this::hideAlertWithAnimation, duration);
         }
     }
 
@@ -91,13 +81,10 @@ public class Alertify extends LinearLayout {
         animator.setDuration(ANIMATION_DURATION);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
 
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
-                // Update the height of the layout during the animation
-                getLayoutParams().height = (int) animation.getAnimatedValue();
-                requestLayout(); // Re-layout the view with the updated height
-            }
+        animator.addUpdateListener(animation -> {
+            // Update the height of the layout during the animation
+            getLayoutParams().height = (int) animation.getAnimatedValue();
+            requestLayout(); // Re-layout the view with the updated height
         });
 
         animator.start();
@@ -113,13 +100,10 @@ public class Alertify extends LinearLayout {
         animator.setDuration(ANIMATION_DURATION);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
 
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
-                // Update the height of the layout during the animation
-                getLayoutParams().height = (int) animation.getAnimatedValue();
-                requestLayout(); // Re-layout the view with the updated height
-            }
+        animator.addUpdateListener(animation -> {
+            // Update the height of the layout during the animation
+            getLayoutParams().height = (int) animation.getAnimatedValue();
+            requestLayout(); // Re-layout the view with the updated height
         });
 
         // Add a listener to handle the end of the animation
