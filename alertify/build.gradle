@@ -25,17 +25,6 @@ android {
     }
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-             groupId = "com.github.AbAhmadani"
-             artifactId = "alertify"
-             version = "1.0.0"
-        }
-    }
-}
-
-
 dependencies {
 
     implementation libs.appcompat
