@@ -9,7 +9,7 @@ publishing {
         alertify(MavenPublication) {
             groupId 'com.example'
             artifactId 'alertify'
-            artifact("$buildDir/outputs/aar/alertify-debug.aar")
+            version '1.0.0'
         }
     }
     repositories {
