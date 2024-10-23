@@ -14,6 +14,7 @@ import com.example.alertify.Alertify;
 
 public class MainActivity extends AppCompatActivity {
     private Alertify alertify;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         successButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertify.showAlert("Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! Success Alert! ", AlertType.SUCCESS, 3000);
+                alertify.showAlert("Success Alert!", AlertType.ERROR, 3000);
             }
         });
 
