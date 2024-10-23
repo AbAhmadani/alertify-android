@@ -9,7 +9,7 @@ publishing {
         alertify(MavenPublication) {
             groupId 'com.example'
             artifactId 'alertify'
-            version '1.0.4'
+            version '1.0.0'
         }
     }
     repositories {
