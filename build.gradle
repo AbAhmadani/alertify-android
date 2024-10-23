@@ -6,7 +6,7 @@ plugins {
 
 publishing {
     publications {
-        alertify(MavenPublication) {
+        maven(MavenPublication) {
             groupId 'com.example'
             artifactId 'alertify'
             version '1.0.0'
