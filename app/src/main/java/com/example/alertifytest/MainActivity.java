@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         successButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertify.showAlert("Success Alert!", AlertType.ERROR, 3000);
+                alertify.showAlert("Success Alert!", AlertType.SUCCESS, 3000);
             }
         });
 
