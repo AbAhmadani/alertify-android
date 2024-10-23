@@ -8,12 +8,12 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 public class Alertify extends LinearLayout {
@@ -82,8 +82,6 @@ public class Alertify extends LinearLayout {
     private void showAlertWithAnimation() {
         // Prepare the alert by setting its height to 0 initially
         setVisibility(View.VISIBLE);
-        final int initialHeight = getHeight();
-
         // Measure the full height of the view
         measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         final int targetHeight = getMeasuredHeight();
@@ -95,7 +93,7 @@ public class Alertify extends LinearLayout {
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
+            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
                 // Update the height of the layout during the animation
                 getLayoutParams().height = (int) animation.getAnimatedValue();
                 requestLayout(); // Re-layout the view with the updated height
@@ -117,7 +115,7 @@ public class Alertify extends LinearLayout {
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
+            public void onAnimationUpdate(@NonNull ValueAnimator animation) {
                 // Update the height of the layout during the animation
                 getLayoutParams().height = (int) animation.getAnimatedValue();
                 requestLayout(); // Re-layout the view with the updated height
@@ -139,7 +137,6 @@ public class Alertify extends LinearLayout {
 
         animator.start();
     }
-
 
 
     // Set the style based on the alert type (affects only inner content)
