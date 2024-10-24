@@ -4,24 +4,23 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="10dp">
+    android:padding="8dp">
 
     <!-- Icon at the start -->
     <ImageView
         android:id="@+id/alert_icon"
         android:layout_width="18dp"
-        android:layout_height="18dp"
-         />
+        android:layout_height="18dp" />
 
     <!-- Text message -->
     <TextView
         android:id="@+id/alert_message"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_marginHorizontal="10dp"
-        android:singleLine="true"
+        android:layout_weight="1"
         android:ellipsize="end"
+        android:singleLine="true"
         android:textColor="@android:color/black" />
 
     <!-- Close button -->

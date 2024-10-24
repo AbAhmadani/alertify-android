@@ -22,6 +22,7 @@ public class Alertify extends LinearLayout {
     private ImageView alertIcon;
     private ImageView closeButton;
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private AlertListener alertListener; // To store the alert listener
 
     private static final long ANIMATION_DURATION = 200; // Animation duration in milliseconds
 
@@ -52,10 +53,13 @@ public class Alertify extends LinearLayout {
         closeButton.setOnClickListener(v -> hideAlertWithAnimation());
     }
 
-    // Show an alert with a specific type, message, and duration
-    public void showAlert(String message, AlertType type, int duration) {
+    // Show an alert with an optional type, message, duration, and alert listener
+    public void showAlert(String message, AlertType type, Integer duration, AlertListener alertListener) {
         alertMessage.setText(message);
         setAlertStyle(type);
+
+        // Store the alert listener for later use when dismissing
+        this.alertListener = alertListener;
 
         // Show the alert with an animation
         showAlertWithAnimation();
@@ -63,21 +67,50 @@ public class Alertify extends LinearLayout {
         // Cancel any previously scheduled hide operations
         handler.removeCallbacksAndMessages(null);
 
-        // Hide the alert after a certain duration
-        if (duration > 0) {
+        // Hide the alert after a certain duration if provided
+        if (duration != null && duration > 0) {
             handler.postDelayed(this::hideAlertWithAnimation, duration);
         }
     }
 
-    // Show the alert by expanding the height from 0 to full height
+    // Show an alert with an optional type, message, and alert listener
+    public void showAlert(String message, AlertType type, AlertListener alertListener) {
+        alertMessage.setText(message);
+        setAlertStyle(type);
+
+        // Store the alert listener for later use when dismissing
+        this.alertListener = alertListener;
+
+        // Show the alert with an animation
+        showAlertWithAnimation();
+
+        // Cancel any previously scheduled hide operations
+        handler.removeCallbacksAndMessages(null);
+    }
+
+
+    // Overloaded method to make duration and alertListener optional
+    public void showAlert(String message, AlertType type) {
+        showAlert(message, type, null, null);
+    }
+
+    public void showAlert(String message, AlertType type, int duration) {
+        showAlert(message, type, duration, null);
+    }
+
     private void showAlertWithAnimation() {
-        // Prepare the alert by setting its height to 0 initially
+        // Make the alert visible and set its height to 0 initially
         setVisibility(View.VISIBLE);
+
         // Measure the full height of the view
         measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         final int targetHeight = getMeasuredHeight();
 
-        // Animate the height from 0 to the full measured height (expanding)
+        // Set the height to 0 to start the animation
+        getLayoutParams().height = 0; // Keep this as 0 to expand from the bottom
+        requestLayout(); // Ensure the layout is updated
+
+        // Animate the height from 0 to the full measured height
         ValueAnimator animator = ValueAnimator.ofInt(0, targetHeight);
         animator.setDuration(ANIMATION_DURATION);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -88,15 +121,24 @@ public class Alertify extends LinearLayout {
             requestLayout(); // Re-layout the view with the updated height
         });
 
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (alertListener != null) {
+                    alertListener.onShow(); // Call onShow callback after the alert is fully shown
+                }
+            }
+        });
+
         animator.start();
     }
 
 
-    // Hide the alert by collapsing the height back to 0
     private void hideAlertWithAnimation() {
+        // Get the current height of the alert
         final int initialHeight = getHeight();
 
-        // Animate the height from the full height to 0 (collapsing from the top)
+        // Animate the height from the full height to 0 (collapsing)
         ValueAnimator animator = ValueAnimator.ofInt(initialHeight, 0);
         animator.setDuration(ANIMATION_DURATION);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -113,15 +155,19 @@ public class Alertify extends LinearLayout {
             public void onAnimationEnd(Animator animation) {
                 // Ensure the view is gone when animation ends
                 setVisibility(View.GONE);
-
                 // Reset the height back to wrap_content for future showAlert calls
                 getLayoutParams().height = LinearLayout.LayoutParams.WRAP_CONTENT;
                 requestLayout();
+
+                if (alertListener != null) {
+                    alertListener.onCancel(); // Call onCancel callback after the alert is dismissed
+                }
             }
         });
 
         animator.start();
     }
+
 
 
     // Set the style based on the alert type (affects only inner content)

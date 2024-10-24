@@ -5,45 +5,46 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <!-- Custom Alertify view -->
     <com.example.alertify.Alertify
         android:id="@+id/alertify"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp" />
 
     <!-- Buttons to trigger alerts -->
     <Button
         android:id="@+id/button_success"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show Success Alert"
-        android:layout_margin="16dp"/>
+        android:layout_margin="16dp"
+        android:text="Show Success Alert" />
 
     <Button
         android:id="@+id/button_error"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show Error Alert"
         android:layout_below="@id/button_success"
-        android:layout_margin="16dp" />
+        android:layout_margin="16dp"
+        android:text="Show Error Alert" />
 
     <Button
         android:id="@+id/button_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show Info Alert"
         android:layout_below="@id/button_error"
-        android:layout_margin="16dp" />
+        android:layout_margin="16dp"
+        android:text="Show Info Alert" />
 
     <Button
         android:id="@+id/button_warning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show Warning Alert"
         android:layout_below="@id/button_info"
-        android:layout_margin="16dp" />
+        android:layout_margin="16dp"
+        android:text="Show Warning Alert" />
 </LinearLayout>

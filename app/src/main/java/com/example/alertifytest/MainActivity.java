@@ -9,6 +9,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.alertify.AlertListener;
 import com.example.alertify.AlertType;
 import com.example.alertify.Alertify;
 
@@ -17,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -36,28 +36,68 @@ public class MainActivity extends AppCompatActivity {
         successButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertify.showAlert("Success Alert!", AlertType.SUCCESS, 3000);
+                alertify.showAlert("Success Alert!", AlertType.SUCCESS, 3000, new AlertListener() {
+                    @Override
+                    public void onShow() {
+                        System.out.println("Success Alert Showing");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        System.out.println("Success Alert Close");
+                    }
+                });
             }
         });
 
         errorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertify.showAlert("Error Alert!", AlertType.ERROR, 3000);
+                alertify.showAlert("Error Alert!", AlertType.ERROR, 3000, new AlertListener() {
+                    @Override
+                    public void onShow() {
+                        System.out.println("Error Alert Showing");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        System.out.println("Error Alert Close");
+                    }
+                });
             }
         });
 
         infoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertify.showAlert("Info Alert!", AlertType.INFO, 3000);
+                alertify.showAlert("Info Alert!", AlertType.INFO, 3000, new AlertListener() {
+                    @Override
+                    public void onShow() {
+                        System.out.println("Info Alert Showing");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        System.out.println("Info Alert Close");
+                    }
+                });
             }
         });
 
         warningButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertify.showAlert("Warning Alert!", AlertType.WARNING, 3000);
+                alertify.showAlert("Warning Alert!", AlertType.WARNING, 3000, new AlertListener() {
+                    @Override
+                    public void onShow() {
+                        System.out.println("Warning Alert Showing");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        System.out.println("Warning Alert Close");
+                    }
+                });
             }
         });
     }
