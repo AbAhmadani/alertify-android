@@ -33,3 +33,16 @@ dependencies {
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.example'
+            artifactId 'alertify'
+            version '1.0.0'
+        }
+    }
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
