@@ -20,6 +20,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AlertifyTest"
+rootProject.name = "Alertify"
 include ':app'
 include ':alertify'
