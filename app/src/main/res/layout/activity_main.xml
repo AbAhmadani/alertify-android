@@ -9,13 +9,6 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <!-- Custom Alertify view -->
-    <com.example.alertify.Alertify
-        android:id="@+id/alertify"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp" />
-
     <!-- Buttons to trigger alerts -->
     <Button
         android:id="@+id/button_success"

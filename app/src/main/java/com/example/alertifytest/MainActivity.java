@@ -10,11 +10,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.alertify.AlertListener;
+import com.example.alertify.AlertPosition;
 import com.example.alertify.AlertType;
 import com.example.alertify.Alertify;
 
 public class MainActivity extends AppCompatActivity {
-    private Alertify alertify;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,8 +26,6 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        alertify = findViewById(R.id.alertify); // Ensure the Alertify view is in your main layout
-
         Button successButton = findViewById(R.id.button_success);
         Button errorButton = findViewById(R.id.button_error);
         Button infoButton = findViewById(R.id.button_info);
@@ -36,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         successButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertify.showAlert("Success Alert!", AlertType.SUCCESS, 3000, new AlertListener() {
+                Alertify.showAlert(MainActivity.this, "Success Alert!", AlertType.SUCCESS, 3000, AlertPosition.TOP, new AlertListener() {
                     @Override
                     public void onShow() {
                         System.out.println("Success Alert Showing");
@@ -53,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         errorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertify.showAlert("Error Alert!", AlertType.ERROR, 3000, new AlertListener() {
+                Alertify.showAlert(MainActivity.this, "Error Alert!", AlertType.ERROR, 3000, AlertPosition.TOP_RIGHT, new AlertListener() {
                     @Override
                     public void onShow() {
                         System.out.println("Error Alert Showing");
@@ -70,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         infoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertify.showAlert("Info Alert!", AlertType.INFO, 3000, new AlertListener() {
+                Alertify.showAlert(MainActivity.this, "Info Alert!", AlertType.INFO, 3000, AlertPosition.BOTTOM_RIGHT, new AlertListener() {
                     @Override
                     public void onShow() {
                         System.out.println("Info Alert Showing");
@@ -87,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         warningButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                alertify.showAlert("Warning Alert!", AlertType.WARNING, 3000, new AlertListener() {
+                Alertify.showAlert(MainActivity.this, "Warning Alert!", AlertType.WARNING, 3000, AlertPosition.BOTTOM, new AlertListener() {
                     @Override
                     public void onShow() {
                         System.out.println("Warning Alert Showing");

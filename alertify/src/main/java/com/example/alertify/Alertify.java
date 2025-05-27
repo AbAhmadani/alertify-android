@@ -1,207 +1,226 @@
 package com.example.alertify;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.PixelFormat;
 import android.os.Handler;
-import android.os.Looper;
-import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
-public class Alertify extends LinearLayout {
+public class Alertify {
 
-    private TextView alertMessage;
-    private ImageView alertIcon;
-    private ImageView closeButton;
-    private final Handler handler = new Handler(Looper.getMainLooper());
-    private AlertListener alertListener; // To store the alert listener
-
-    private static final long ANIMATION_DURATION = 200; // Animation duration in milliseconds
-
-    public Alertify(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context);
-    }
-
-    public Alertify(Context context) {
-        super(context);
-        init(context);
-    }
-
-    private void init(Context context) {
-        // Inflate the custom alert layout
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.alertify_view, this, true);
-
-        // Get views for message, icon, and close button
-        alertMessage = view.findViewById(R.id.alert_message);
-        alertIcon = view.findViewById(R.id.alert_icon);
-        closeButton = view.findViewById(R.id.alert_close_button);
-
-        // Initially hide the alert container
-        setVisibility(View.GONE);
-
-        // Close button action
-        closeButton.setOnClickListener(v -> hideAlertWithAnimation());
-    }
-
-    // Show an alert with an optional type, message, duration, and alert listener
-    public void showAlert(String message, AlertType type, Integer duration, AlertListener alertListener) {
-        alertMessage.setText(message);
-        setAlertStyle(type);
-
-        // Store the alert listener for later use when dismissing
-        this.alertListener = alertListener;
-
-        // Show the alert with an animation
-        showAlertWithAnimation();
-
-        // Cancel any previously scheduled hide operations
-        handler.removeCallbacksAndMessages(null);
-
-        // Hide the alert after a certain duration if provided
-        if (duration != null && duration > 0) {
-            handler.postDelayed(this::hideAlertWithAnimation, duration);
+    private static View alertView;
+    private static WindowManager windowManager;
+    private static final Handler handler = new Handler();
+    private static Runnable removeRunnable;
+    private static AlertPosition currentAlertPosition = AlertPosition.BOTTOM; // Default position
+    public static void showAlert(Activity activity, String message, AlertType type, int duration, AlertPosition position, AlertListener listener) {
+        // Prevent showing alert if the activity is finishing or destroyed
+        if (activity.isFinishing() || activity.isDestroyed()) {
+            return;
         }
+
+        // --- MODIFIED LOGIC HERE ---
+        // If an alert is already visible, remove it immediately (skip animation)
+        // before showing the new alert.
+        if (alertView != null) {
+            removeAlertImmediate(); // Remove old alert without animation
+        }
+        // Always proceed to show the new alert, which will animate in.
+        showAlertInternal(activity, message, type, duration, position, listener);
+        // --- END MODIFIED LOGIC ---
     }
 
-    // Show an alert with an optional type, message, and alert listener
-    public void showAlert(String message, AlertType type, AlertListener alertListener) {
+    private static void showAlertInternal(Activity activity, String message, AlertType type, int duration, AlertPosition position, AlertListener listener) {
+        // Get the WindowManager service
+        windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        // Inflate the custom alert layout
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        alertView = inflater.inflate(R.layout.alertify_view, null);
+
+        // Initialize UI components
+        TextView alertMessage = alertView.findViewById(R.id.alert_message);
+        ImageView alertIcon = alertView.findViewById(R.id.alert_icon);
+        ImageView closeButton = alertView.findViewById(R.id.alert_close_button);
+
+        // Set the alert message
         alertMessage.setText(message);
-        setAlertStyle(type);
 
-        // Store the alert listener for later use when dismissing
-        this.alertListener = alertListener;
-
-        // Show the alert with an animation
-        showAlertWithAnimation();
-
-        // Cancel any previously scheduled hide operations
-        handler.removeCallbacksAndMessages(null);
-    }
-
-
-    // Overloaded method to make duration and alertListener optional
-    public void showAlert(String message, AlertType type) {
-        showAlert(message, type, null, null);
-    }
-
-    public void showAlert(String message, AlertType type, int duration) {
-        showAlert(message, type, duration, null);
-    }
-
-    private void showAlertWithAnimation() {
-        // Make the alert visible and set its height to 0 initially
-        setVisibility(View.VISIBLE);
-
-        // Measure the full height of the view
-        measure(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        final int targetHeight = getMeasuredHeight();
-
-        // Set the height to 0 to start the animation
-        getLayoutParams().height = 0; // Keep this as 0 to expand from the bottom
-        requestLayout(); // Ensure the layout is updated
-
-        // Animate the height from 0 to the full measured height
-        ValueAnimator animator = ValueAnimator.ofInt(0, targetHeight);
-        animator.setDuration(ANIMATION_DURATION);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-
-        animator.addUpdateListener(animation -> {
-            // Update the height of the layout during the animation
-            getLayoutParams().height = (int) animation.getAnimatedValue();
-            requestLayout(); // Re-layout the view with the updated height
-        });
-
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                if (alertListener != null) {
-                    alertListener.onShow(); // Call onShow callback after the alert is fully shown
-                }
-            }
-        });
-
-        animator.start();
-    }
-
-
-    private void hideAlertWithAnimation() {
-        // Get the current height of the alert
-        final int initialHeight = getHeight();
-
-        // Animate the height from the full height to 0 (collapsing)
-        ValueAnimator animator = ValueAnimator.ofInt(initialHeight, 0);
-        animator.setDuration(ANIMATION_DURATION);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-
-        animator.addUpdateListener(animation -> {
-            // Update the height of the layout during the animation
-            getLayoutParams().height = (int) animation.getAnimatedValue();
-            requestLayout(); // Re-layout the view with the updated height
-        });
-
-        // Add a listener to handle the end of the animation
-        animator.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                // Ensure the view is gone when animation ends
-                setVisibility(View.GONE);
-                // Reset the height back to wrap_content for future showAlert calls
-                getLayoutParams().height = LinearLayout.LayoutParams.WRAP_CONTENT;
-                requestLayout();
-
-                if (alertListener != null) {
-                    alertListener.onCancel(); // Call onCancel callback after the alert is dismissed
-                }
-            }
-        });
-
-        animator.start();
-    }
-
-
-
-    // Set the style based on the alert type (affects only inner content)
-    private void setAlertStyle(AlertType type) {
-        int iconRes;
-        int iconColor;
-
-        // Set style based on the type of alert
+        // Determine background, icon, and icon color based on alert type
+        int backgroundRes, iconRes, iconColor;
         switch (type) {
             case SUCCESS:
-                setBackgroundResource(R.drawable.success_alert_bg);
+                backgroundRes = R.drawable.success_alert_bg;
                 iconColor = R.color.success_dark;
                 iconRes = R.drawable.ic_success;
                 break;
             case ERROR:
-                setBackgroundResource(R.drawable.error_alert_bg);
+                backgroundRes = R.drawable.error_alert_bg;
                 iconColor = R.color.error_dark;
                 iconRes = R.drawable.ic_error;
                 break;
             case WARNING:
-                setBackgroundResource(R.drawable.warning_alert_bg);
+                backgroundRes = R.drawable.warning_alert_bg;
                 iconColor = R.color.warning_dark;
                 iconRes = R.drawable.ic_warning;
                 break;
-            default:
-                setBackgroundResource(R.drawable.info_alert_bg);
+            default: // INFO type
+                backgroundRes = R.drawable.info_alert_bg;
                 iconColor = R.color.info_dark;
                 iconRes = R.drawable.ic_info;
                 break;
         }
 
-        // Set background color and icon for inner content
+        // Apply determined resources and colors
+        alertView.setBackgroundResource(backgroundRes);
         alertIcon.setImageResource(iconRes);
-        alertIcon.setColorFilter(ContextCompat.getColor(getContext(), iconColor), android.graphics.PorterDuff.Mode.SRC_IN); // Tint the icon
-        closeButton.setColorFilter(ContextCompat.getColor(getContext(), iconColor), android.graphics.PorterDuff.Mode.SRC_IN); // Tint the close button
+        alertIcon.setColorFilter(ContextCompat.getColor(activity, iconColor));
+        closeButton.setColorFilter(ContextCompat.getColor(activity, iconColor));
+
+        // Set click listener for the close button to dismiss the alert
+        closeButton.setOnClickListener(v -> {
+            removeAlert();
+            if (listener != null) listener.onCancel(); // Notify listener on manual cancel
+        });
+
+        // Define layout parameters for the alert window
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT, // Width
+                WindowManager.LayoutParams.WRAP_CONTENT, // Height
+                WindowManager.LayoutParams.TYPE_APPLICATION, // Window type (within the application)
+                // Flags: NOT_FOCUSABLE allows clicks to pass through to underlying views,
+                // LAYOUT_IN_SCREEN ensures it's positioned relative to the screen.
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+                PixelFormat.TRANSLUCENT // Allows transparency
+        );
+
+        // Set gravity based on the desired position
+        params.gravity = getGravity(position);
+        // Add vertical and horizontal offsets for padding
+        params.y = 60; // Vertical offset
+        params.x = 30; // Horizontal offset
+
+        // Store the current alert position for removal animation
+        currentAlertPosition = position;
+
+        // Initial state for animation: off-screen and fully transparent
+        alertView.setTranslationY(getTranslationY(position));
+        alertView.setAlpha(0f);
+
+        // Add the alert view to the window
+        windowManager.addView(alertView, params);
+
+        // Animate the alert into view (slide in and fade in)
+        alertView.animate()
+                .translationY(0) // Slide to its final position
+                .alpha(1f)       // Fade in
+                .setDuration(300) // Animation duration
+                .start();
+
+        if (listener != null) listener.onShow(); // Notify listener that the alert is shown
+
+        // Remove any existing scheduled removal runnable to prevent conflicts
+        if (removeRunnable != null) {
+            handler.removeCallbacks(removeRunnable);
+        }
+
+        // Schedule the alert to be removed automatically after the specified duration
+        removeRunnable = () -> {
+            removeAlert(); // Remove the alert
+            if (listener != null) listener.onCancel(); // Notify listener on auto-cancel
+        };
+
+        handler.postDelayed(removeRunnable, duration);
+    }
+
+    private static int getGravity(AlertPosition position) {
+        switch (position) {
+            case TOP:
+                return Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+            case BOTTOM:
+                return Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+            case CENTER:
+                return Gravity.CENTER;
+            case TOP_LEFT:
+                return Gravity.TOP | Gravity.LEFT;
+            case TOP_RIGHT:
+                return Gravity.TOP | Gravity.RIGHT;
+            case BOTTOM_LEFT:
+                return Gravity.BOTTOM | Gravity.LEFT;
+            case BOTTOM_RIGHT:
+                return Gravity.BOTTOM | Gravity.RIGHT;
+            default: // Default to BOTTOM_CENTER
+                return Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+        }
+    }
+    private static int getTranslationY(AlertPosition position) {
+        switch (position) {
+            case TOP:
+            case TOP_LEFT:
+            case TOP_RIGHT:
+                return -300; // Slide out upwards
+            case CENTER:
+                return 0; // No Animation
+            default:
+                return 300; // Slide out downwards
+        }
+    }
+
+    public static void removeAlert() {
+        if (alertView != null && windowManager != null) {
+            int endY = getTranslationY(currentAlertPosition); // Get the end Y-translation for slide-out
+
+            // Animate the alert out (slide out and fade out)
+            alertView.animate()
+                    .translationY(endY) // Slide to off-screen position
+                    .alpha(0f)          // Fade out
+                    .setDuration(300)   // Animation duration
+                    .withEndAction(() -> {
+                        // This runnable executes after the animation completes.
+                        // Add a small delay to ensure the animation is fully rendered before removing the view.
+                        handler.postDelayed(() -> {
+                            try {
+                                if (alertView != null && windowManager != null) {
+                                    windowManager.removeView(alertView); // Remove the view from the window
+                                }
+                            } catch (Exception ignored) {
+                                // Catching IllegalArgumentException if view is already removed,
+                                // or other exceptions. Ignoring them to prevent crashes.
+                            } finally {
+                                alertView = null; // Clear the reference to the alert view
+                            }
+                        }, 50); // Small delay (e.g., 50ms)
+                    })
+                    .start();
+        }
+
+        // Remove any pending auto-removal runnable
+        if (removeRunnable != null) {
+            handler.removeCallbacks(removeRunnable);
+            removeRunnable = null;
+        }
+    }
+
+    private static void removeAlertImmediate() {
+        if (alertView != null && windowManager != null) {
+            try {
+                windowManager.removeView(alertView);
+            } catch (Exception ignored) {
+                // Catching IllegalArgumentException if view is already removed.
+            } finally {
+                alertView = null;
+            }
+        }
+
+        if (removeRunnable != null) {
+            handler.removeCallbacks(removeRunnable);
+            removeRunnable = null;
+        }
     }
 }
