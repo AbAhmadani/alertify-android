@@ -2,6 +2,7 @@ package com.example.alertify;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.view.Gravity;
@@ -19,25 +20,74 @@ public class Alertify {
     private static WindowManager windowManager;
     private static final Handler handler = new Handler();
     private static Runnable removeRunnable;
-    private static AlertPosition currentAlertPosition = AlertPosition.BOTTOM; // Default position
-    public static void showAlert(Activity activity, String message, AlertType type, int duration, AlertPosition position, AlertListener listener) {
+
+    public static void showAlert(Activity activity, String message, AlertType type, int duration, AlertListener listener) {
         // Prevent showing alert if the activity is finishing or destroyed
         if (activity.isFinishing() || activity.isDestroyed()) {
             return;
         }
 
         // --- MODIFIED LOGIC HERE ---
-        // If an alert is already visible, remove it immediately (skip animation)
         // before showing the new alert.
         if (alertView != null) {
-            removeAlertImmediate(); // Remove old alert without animation
+            removeAlert(); // Remove old alert
         }
-        // Always proceed to show the new alert, which will animate in.
-        showAlertInternal(activity, message, type, duration, position, listener);
+        // Always proceed to show the new alert
+        showAlertInternal(activity, message, type, duration, listener);
         // --- END MODIFIED LOGIC ---
     }
 
-    private static void showAlertInternal(Activity activity, String message, AlertType type, int duration, AlertPosition position, AlertListener listener) {
+    public static void showAlert(Activity activity, String message, AlertType type, int duration) {
+        // Prevent showing alert if the activity is finishing or destroyed
+        if (activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+
+        // --- MODIFIED LOGIC HERE ---
+        // before showing the new alert.
+        if (alertView != null) {
+            removeAlert(); // Remove old alert
+        }
+        // Always proceed to show the new alert
+        showAlertInternal(activity, message, type, duration, null);
+        // --- END MODIFIED LOGIC ---
+    }
+
+
+    public static void showAlert(Activity activity, String message, AlertType type, AlertListener listener) {
+        // Prevent showing alert if the activity is finishing or destroyed
+        if (activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+
+        // --- MODIFIED LOGIC HERE ---
+        // before showing the new alert.
+        if (alertView != null) {
+            removeAlert(); // Remove old alert
+        }
+        // Always proceed to show the new alert
+        showAlertInternal(activity, message, type, 3000, listener);
+        // --- END MODIFIED LOGIC ---
+    }
+
+    public static void showAlert(Activity activity, String message, AlertType type) {
+        // Prevent showing alert if the activity is finishing or destroyed
+        if (activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+
+        // --- MODIFIED LOGIC HERE ---
+        // before showing the new alert.
+        if (alertView != null) {
+            removeAlert(); // Remove old alert
+        }
+        // Always proceed to show the new alert
+        showAlertInternal(activity, message, type, 3000, null);
+        // --- END MODIFIED LOGIC ---
+    }
+
+
+    private static void showAlertInternal(Activity activity, String message, AlertType type, int duration, AlertListener listener) {
         // Get the WindowManager service
         windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         // Inflate the custom alert layout
@@ -91,7 +141,7 @@ public class Alertify {
 
         // Define layout parameters for the alert window
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT, // Width
+                Resources.getSystem().getDisplayMetrics().widthPixels - 20, // Width
                 WindowManager.LayoutParams.WRAP_CONTENT, // Height
                 WindowManager.LayoutParams.TYPE_APPLICATION, // Window type (within the application)
                 // Flags: NOT_FOCUSABLE allows clicks to pass through to underlying views,
@@ -101,27 +151,12 @@ public class Alertify {
         );
 
         // Set gravity based on the desired position
-        params.gravity = getGravity(position);
+        params.gravity = Gravity.BOTTOM;
         // Add vertical and horizontal offsets for padding
-        params.y = 60; // Vertical offset
-        params.x = 30; // Horizontal offset
-
-        // Store the current alert position for removal animation
-        currentAlertPosition = position;
-
-        // Initial state for animation: off-screen and fully transparent
-        alertView.setTranslationY(getTranslationY(position));
-        alertView.setAlpha(0f);
+        params.y = 10; // Vertical offset
 
         // Add the alert view to the window
         windowManager.addView(alertView, params);
-
-        // Animate the alert into view (slide in and fade in)
-        alertView.animate()
-                .translationY(0) // Slide to its final position
-                .alpha(1f)       // Fade in
-                .setDuration(300) // Animation duration
-                .start();
 
         if (listener != null) listener.onShow(); // Notify listener that the alert is shown
 
@@ -139,75 +174,8 @@ public class Alertify {
         handler.postDelayed(removeRunnable, duration);
     }
 
-    private static int getGravity(AlertPosition position) {
-        switch (position) {
-            case TOP:
-                return Gravity.TOP | Gravity.CENTER_HORIZONTAL;
-            case BOTTOM:
-                return Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-            case CENTER:
-                return Gravity.CENTER;
-            case TOP_LEFT:
-                return Gravity.TOP | Gravity.LEFT;
-            case TOP_RIGHT:
-                return Gravity.TOP | Gravity.RIGHT;
-            case BOTTOM_LEFT:
-                return Gravity.BOTTOM | Gravity.LEFT;
-            case BOTTOM_RIGHT:
-                return Gravity.BOTTOM | Gravity.RIGHT;
-            default: // Default to BOTTOM_CENTER
-                return Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
-        }
-    }
-    private static int getTranslationY(AlertPosition position) {
-        switch (position) {
-            case TOP:
-            case TOP_LEFT:
-            case TOP_RIGHT:
-                return -300; // Slide out upwards
-            case CENTER:
-                return 0; // No Animation
-            default:
-                return 300; // Slide out downwards
-        }
-    }
 
-    public static void removeAlert() {
-        if (alertView != null && windowManager != null) {
-            int endY = getTranslationY(currentAlertPosition); // Get the end Y-translation for slide-out
-
-            // Animate the alert out (slide out and fade out)
-            alertView.animate()
-                    .translationY(endY) // Slide to off-screen position
-                    .alpha(0f)          // Fade out
-                    .setDuration(300)   // Animation duration
-                    .withEndAction(() -> {
-                        // This runnable executes after the animation completes.
-                        // Add a small delay to ensure the animation is fully rendered before removing the view.
-                        handler.postDelayed(() -> {
-                            try {
-                                if (alertView != null && windowManager != null) {
-                                    windowManager.removeView(alertView); // Remove the view from the window
-                                }
-                            } catch (Exception ignored) {
-                                // Catching IllegalArgumentException if view is already removed,
-                                // or other exceptions. Ignoring them to prevent crashes.
-                            } finally {
-                                alertView = null; // Clear the reference to the alert view
-                            }
-                        }, 50); // Small delay (e.g., 50ms)
-                    })
-                    .start();
-        }
-
-        // Remove any pending auto-removal runnable
-        if (removeRunnable != null) {
-            handler.removeCallbacks(removeRunnable);
-            removeRunnable = null;
-        }
-    }
-
-    private static void removeAlertImmediate() {
+    private static void removeAlert() {
         if (alertView != null && windowManager != null) {
             try {
                 windowManager.removeView(alertView);
